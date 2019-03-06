@@ -150,7 +150,7 @@ struct AlloApp : App {
   // interaction
   void onKeyDown(const Keyboard &k) override {
     switch (k.key()) {
-    case 'p':
+    case 'j':
       pause = !pause;
       break;
     }
