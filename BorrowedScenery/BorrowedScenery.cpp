@@ -1,16 +1,24 @@
-#include "Gamma/SamplePlayer.h" //sound
+#include "Gamma/SamplePlayer.h"  //sound
 #include "al/core.hpp"
+#include "al/core/app/al_DistributedApp.hpp"
 #include "al/util/al_Asset.hpp"
 #include "al/util/al_Image.hpp"
-#include "shader.h"
-#include <algorithm> // max
-#include <cstdint>   // uint8_t
+
+#include <algorithm>  // max
+#include <cstdint>    // uint8_t
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include "shader.h"
 using namespace al;
 using namespace gam;
 using namespace std;
+
+struct SharedState {
+  double time{0};
+  double angle{0};
+};
+
 #include "helper.h"
 
 #include "Animation.h"
@@ -19,7 +27,9 @@ using namespace std;
 #include "PointCloud.h"
 #include "grid.h"
 
-struct AlloApp : App {
+// struct AlloApp : App {
+
+struct DistributedExampleApp : DistributedApp<SharedState> {
   bool pause = false;
   PixelCloud pixelCloud;
   Movers movers;
@@ -42,8 +52,10 @@ struct AlloApp : App {
     animation.scheduleAnimation();
   }
 
-  double angle = 0;
   void onDraw(Graphics &g) override {
+    double time = state().time;
+    double angle = state().angle;
+
     g.rotate(angle, Vec3f(0, 1, 0));
     // opening
     if (animation.opening(time)) {
@@ -104,14 +116,19 @@ struct AlloApp : App {
     }
   }
 
-  double time = 0;
+  virtual void simulate(double dt) override {
+    // if (app.isPrimary()) {
+    state().angle += 0.01;
+    state().time += dt;
+  }
+
   void onAnimate(double dt) override {
     if (pause) {
       return;
     }
-    // setup time
-    angle += 0.01;
-    time += dt;
+
+    double time = state().time;
+    double angle = state().angle;
 
     // initial nav
     nav().pos(nav_current);
@@ -150,9 +167,9 @@ struct AlloApp : App {
   // interaction
   void onKeyDown(const Keyboard &k) override {
     switch (k.key()) {
-    case 'p':
-      pause = !pause;
-      break;
+      case 'p':
+        pause = !pause;
+        break;
     }
   }
 
@@ -166,11 +183,8 @@ struct AlloApp : App {
 };
 
 int main(int argc, char *const argv[]) {
-  // // added obj
-  // searchpaths.addAppPaths(argc, argv);
-  // searchpaths.addSearchPath(searchpaths.appPath() + "data");
-  // searchpaths.print();
-  AlloApp app;
+  DistributedExampleApp app;
   app.initAudio();
   app.start();
+  return 0;
 };
