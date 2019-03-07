@@ -50,6 +50,11 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     movers.setup();
     // animation - schedule
     animation.scheduleAnimation();
+
+    if (role() == ROLE_RENDERER) {
+      load_perprojection_configuration();
+      cursorHide(true);
+    }
   }
 
   void onDraw(Graphics &g) override {
