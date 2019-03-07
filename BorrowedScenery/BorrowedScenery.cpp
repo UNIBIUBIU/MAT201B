@@ -189,7 +189,7 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
 int main(int argc, char *const argv[]) {
   DistributedExampleApp app;
-  app.initAudio();
+  if (role() != ROLE_RENDERER) app.initAudio();
   app.start();
   return 0;
 };
