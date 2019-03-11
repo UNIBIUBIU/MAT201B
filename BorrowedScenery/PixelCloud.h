@@ -1,15 +1,17 @@
 // This sketch is for loading image pixels and animating them
 
 struct PixelCloud {
-  vector<Vec3f> pos[10]; //
+  vector<Vec3f> pos[16]; //
   Mesh mesh1{Mesh::POINTS};
   Mesh mesh2{Mesh::POINTS};
   Mesh mesh3{Mesh::POINTS};
   Mesh mesh4{Mesh::POINTS};
+  Mesh mesh5{Mesh::POINTS};
   float timestep = 2;
   float time = 0;
   float time2 = 0;
-
+  float time3 = 0;
+  float angle = 0;
   // load images
   PixelCloud() {
     Image image_1;
@@ -20,6 +22,8 @@ struct PixelCloud {
     const char *fileName3 = "../asset/cactus.jpg";
     Image image_4;
     const char *fileName4 = "../asset/mountains.jpg";
+    Image image_5;
+    const char *fileName5 = "../asset/section3.png";
 
     if (!image_1.load(fileName1)) {
       exit(1);
@@ -31,6 +35,9 @@ struct PixelCloud {
       exit(1);
     }
     if (!image_4.load(fileName4)) {
+      exit(1);
+    }
+    if (!image_5.load(fileName5)) {
       exit(1);
     }
 
@@ -137,6 +144,33 @@ struct PixelCloud {
         mesh4.color(Color(gray));
       }
     }
+
+    // image5 pixel arrangement
+    for (int row = 0; row < image_5.height(); row += 3) {
+      for (int column = 0; column < image_5.width(); column++) {
+        image_5.read(pixel, column, row);
+        Vec3f o5;
+        o5.x = mapFunction(column, 0, image_5.width(), -2, 2);
+        o5.y = mapFunction(row, 0, image_5.height(), -1, 1);
+        o5.z = 0;
+        pos[9].push_back(o5);
+
+        // HSV
+        Vec3f h5;
+        HSV color(RGB(pixel.r, pixel.g, pixel.b));
+        h5.x = color.s * sin(M_2PI * color.h);
+        h5.y = color.s * cos(M_2PI * color.h);
+        h5.z = color.v / 255;
+        pos[10].push_back(h5);
+        mesh5.vertex(o5);
+
+        float gray =
+            HSV(RGB(pixel.r / 255.0, pixel.g / 255.0, pixel.b / 255.0)).v;
+        gray = mapFunction(gray, 0, 1, 0, 1.2);
+        mesh5.color(Color(gray));
+        //mesh5.color(RGB(pixel.r / 255.0, pixel.g / 255.0, pixel.b / 255.0));
+      }
+    }
   }
 
   // image pixel animation
@@ -188,10 +222,26 @@ struct PixelCloud {
     }
   }
 
+  void section3_update(double &dt) {
+    angle += dt;
+    // image 5
+    auto &m5 = mesh5.vertices();
+    time3 += dt / timestep;
+    for (int i = 0; i < m5.size(); i++) {
+      if (time3 < 15) {
+        timestep = 5;
+        m5[i] = pos[9][i] * (10 - time3) + pos[10][i] * time3;
+      } else {
+        timestep = 0.05;
+        m5[i] = pos[10][i] * (30 - time3) + pos[9][i] * (time3 - 15);
+      }
+    }
+  }
+
   void section1_draw(Graphics &g) {
     // draw images
     g.meshColor();
-
+    g.pointSize(2);
     g.pushMatrix();
     g.translate(0, 0, -25);
     // g.rotate(40, Vec3f(1, 0, 1));
@@ -215,6 +265,7 @@ struct PixelCloud {
     auto &m2 = mesh2.vertices();
     auto &m3 = mesh3.vertices();
     auto &m = mesh1.vertices();
+
     // connecting image 1 with image 2
     for (int i = 0; i < m2.size(); i += 50000) {
       for (int j = 0; j < m.size(); j += 80000) {
@@ -241,9 +292,41 @@ struct PixelCloud {
   void section2_draw(Graphics &g) {
     g.meshColor();
     g.pushMatrix();
-    g.pointSize(3);
+    g.pointSize(2.5);
     g.translate(0, 0, -20);
     g.draw(mesh4); // img4
     g.popMatrix();
   }
+
+  void section3_draw(Graphics &g) {
+    g.pushMatrix();
+    g.rotate(angle, Vec3f(1, 0, 1));
+
+    g.meshColor();
+    g.pointSize(2);
+    g.pushMatrix();
+    g.translate(0, 0, -20);
+    g.draw(mesh5); // img5
+    g.popMatrix();
+    g.pushMatrix();
+    g.translate(0, 0, 40);
+    g.draw(mesh5);
+    g.popMatrix();
+
+    // draw cross
+    auto &m5 = mesh5.vertices();
+    for (int i = 0; i < m5.size(); i += 30000) {
+      g.color(1);
+      dashedLine(g, Vec3f(m5[i].x, m5[i].y, m5[i].z + 40),
+                 Vec3f(m5[i].x, m5[i].y, m5[i].z - 20));
+      g.color(RGB(1, 0, 0));
+      g.rotate(45, Vec3f(0, 1, 0));
+      cross(g, Vec3f(m5[i].x, m5[i].y, m5[i].z - 20), 0.35, 0.05);
+      cross(g, Vec3f(m5[i].x, m5[i].y, m5[i].z + 40), 0.35, 0.05);
+    }
+    g.popMatrix();
+  }
+
+  // reset
+  void reset(double &dt) { time = 0; }
 };

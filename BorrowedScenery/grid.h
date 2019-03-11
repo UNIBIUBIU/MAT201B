@@ -44,7 +44,7 @@ struct Ruler {
     }
   }
 
-  void reset(){
+  void reset() {
     dis = 1.0f;
     offset = 0.0f;
   }
@@ -88,19 +88,19 @@ struct Grid {
     pointShader.compile(vertexPoint, fragmentPoint, geometryPoint);
     lineShader.compile(vertexLine, fragmentLine, geometryLine);
 
-    // draw grid
+    // draw grid_1
     grid.primitive(Mesh::LINES);
     for (int y = -50; y < 101; y += 10) {
       for (int z = -100; z < 101; z += 10) {
+        grid.color(Color(1));
         grid.vertex(100, y, z);
         grid.vertex(-100, y, z);
-        grid.color(RGB(0.9, 0.9, 0.9));
         grid.texCoord(rnd::uniform(0.5, 0.1), 0.0);
       }
     }
   }
 
-  void draw(Graphics &g) {
+  void draw_grid_1(Graphics &g) {
     // draw rectangle
     for (int x = -50; x < 101; x += 3) {
       for (int y = -100; y < 101; y += 3) {
@@ -115,6 +115,7 @@ struct Grid {
     // draw grid
     lineTexture.bind();
     g.shader(lineShader);
+    grid.color(RGB(0.5, 0.5, 0.5));
     g.pushMatrix();
     g.draw(grid);
     g.popMatrix();
@@ -129,5 +130,48 @@ struct Grid {
     g.draw(grid);
     g.popMatrix();
     lineTexture.unbind();
+  }
+
+  void draw_grid_2(Graphics &g) {
+    // draw rectangle
+    for (int x = -50; x < 101; x += 3) {
+      for (int y = -100; y < 101; y += 3) {
+        Vec3f pos(x, y + rnd::uniform(-10, 10), x * sin(x));
+        Vec3f pos2(x, y * sin(y), y);
+        rect(g, pos, rnd::uniform(0.01, 0.2), 0.02);
+        rect(g, pos2, 0.02, rnd::uniform(0.1, 0.2));
+      }
+    }
+    // draw grid
+    lineTexture.bind();
+    g.shader(lineShader);
+    g.pushMatrix();
+    g.draw(grid);
+    g.popMatrix();
+    g.pushMatrix();
+    g.rotate(90, Vec3f(0, 1, 0));
+    g.draw(grid);
+    g.popMatrix();
+    g.pushMatrix();
+    g.rotate(90, Vec3f(0, 0, 1));
+    g.draw(grid);
+    g.popMatrix();
+    lineTexture.unbind();
+
+    for (int i = -100; i < 101; i += 40) {
+      dashedLine(g, Vec3f(20, i, 0), Vec3f(-50, i, 0));
+      g.pushMatrix();
+      g.rotate(90, Vec3f(0, 1, 0));
+      dashedLine(g, Vec3f(60, i, 0), Vec3f(-20, i, 0));
+      g.popMatrix();
+      g.pushMatrix();
+      g.rotate(90, Vec3f(0, 0, 1));
+      dashedLine(g, Vec3f(60, i, 0), Vec3f(-20, i, 0));
+      g.popMatrix();
+    }
+  }
+
+  void draw_grid_3(Graphics &g){
+    
   }
 };

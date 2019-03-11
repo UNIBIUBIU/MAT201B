@@ -13,7 +13,7 @@ string fullPathOrDie(string fileName, string whereToLook = ".") {
 // load CSV data
 void loadCSV(string fileName, vector<vector<float>> &data) {
   ifstream f1(fileName, ios::in);
-  //ifstream f1(fullPathOrDie(fileName, ".."), ios::in);
+  // ifstream f1(fullPathOrDie(fileName, ".."), ios::in);
   if (!f1.is_open()) {
     cout << "file not open" << endl;
     exit(1);
@@ -37,6 +37,7 @@ struct PointCloud {
   float r = 4.0f;
   Mesh pointClouds_Mesh{Mesh::LINES};
   vector<vector<float>> data1;
+  float angle = 0.0f;
 
   PointCloud() { loadCSV("../asset/tree.csv", data1); }
 
@@ -66,6 +67,7 @@ struct PointCloud {
     g.pushMatrix();
     g.meshColor();
     g.translate(0, 0, -10);
+    g.rotate(angle, Vec3f(0, 1, 0));
     g.color(RGB((0.9f), (0.9f), (0.9f)));
     g.draw(pointClouds_Mesh);
     g.popMatrix();
@@ -76,5 +78,8 @@ struct PointCloud {
     g.popMatrix();
   }
 
-  void update(double &dt) { r += dt / 2; }
+  void update(double &dt) {
+    r += dt / 2;
+    angle += 0.01;
+  }
 };
