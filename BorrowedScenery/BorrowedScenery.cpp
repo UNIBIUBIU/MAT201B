@@ -15,6 +15,7 @@ using namespace gam;
 using namespace std;
 float timestep = 1.0f;
 struct SharedState {
+  Pose pose;
   double time{0};
   // double angle{0};
 };
@@ -168,12 +169,16 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
   }
 
   virtual void simulate(double dt) override {
+    state().pose = nav();
     // if (app.isPrimary()) {
     // state().angle += 0.01;
     state().time += dt * timestep;
   }
 
   void onAnimate(double dt) override {
+    if (hasRole(ROLE_RENDERER) && !hasRole(ROLE_DESKTOP)) {
+      pose() = state().pose;
+    }
     if (pause) {
       return;
     }
@@ -182,7 +187,7 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     // double angle = state().angle;
 
     // initial nav
-    nav().pos(nav_current);
+    // ky nav().pos(nav_current);
 
     // opening
     if (animation.opening(time)) {
@@ -203,7 +208,7 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
       if (nav_current.x < 4) {
         nav_current.x += dt;
       }
-      nav().pos(nav_current);
+      // ky nav().pos(nav_current);
       ruler.reset();
     }
 
@@ -212,13 +217,13 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
       ruler.update(dt);
       if (time < spiral_start) {
         nav_current = Vec3f(0, 0, 19);
-        nav().pos(nav_current);
+        // ky nav().pos(nav_current);
         pixelCloud.reset(dt);
       } else if (time > spiral_end) {
         if (nav_current.z > 5) {
           nav_current.z -= dt;
         }
-        nav().pos(nav_current);
+        // ky nav().pos(nav_current);
         pixelCloud.section1_update(dt);
       } else {
         nav().pos(Vec3f(0, 0, 19));
@@ -241,10 +246,10 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
       case 'j':
         pause = !pause;
         break;
-      case 'a':
+      case 'k':
         timestep = 10;
         break;
-      case 's':
+      case 'l':
         timestep = 1;
         break;
     }
