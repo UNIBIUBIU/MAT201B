@@ -1,15 +1,15 @@
-#include "Gamma/SamplePlayer.h" //sound
+#include "Gamma/SamplePlayer.h"  //sound
 #include "al/core.hpp"
 #include "al/core/app/al_DistributedApp.hpp"
 #include "al/util/al_Asset.hpp"
 #include "al/util/al_Image.hpp"
 
-#include "shader.h"
-#include <algorithm> // max
-#include <cstdint>   // uint8_t
+#include <algorithm>  // max
+#include <cstdint>    // uint8_t
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include "shader.h"
 using namespace al;
 using namespace gam;
 using namespace std;
@@ -118,7 +118,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     }
     // section3
     if (animation.section3(time)) {
-
       // angle = 0.0;
       if (time < 85) {
         g.clear(0.65);
@@ -187,7 +186,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
     // opening
     if (animation.opening(time)) {
-
       ruler.update(dt);
       if (time > opening_pointcloud) {
         pointCloud.update(dt);
@@ -210,7 +208,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     }
 
     if (animation.section2(time)) {
-
       pixelCloud.section2_update(dt);
       ruler.update(dt);
       if (time < spiral_start) {
@@ -241,15 +238,15 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
   // interaction
   void onKeyDown(const Keyboard &k) override {
     switch (k.key()) {
-    case 'j':
-      pause = !pause;
-      break;
-    case 'a':
-      timestep = 10;
-      break;
-    case 's':
-      timestep = 1;
-      break;
+      case 'j':
+        pause = !pause;
+        break;
+      case 'a':
+        timestep = 10;
+        break;
+      case 's':
+        timestep = 1;
+        break;
     }
   }
 
@@ -264,8 +261,8 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
 int main(int argc, char *const argv[]) {
   DistributedExampleApp app;
-  if (role() != ROLE_RENDERER)
-    app.initAudio();
+  //  if (role() != ROLE_RENDERER)
+  app.initAudio();
   // app.initAudio();
   app.start();
   return 0;
