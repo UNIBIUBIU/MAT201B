@@ -266,6 +266,7 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
 int main(int argc, char *const argv[]) {
   DistributedExampleApp app;
+  app.displayMode(app.displayMode() | Window::STEREO_BUF);
   //  if (role() != ROLE_RENDERER)
   app.initAudio();
   // app.initAudio();
