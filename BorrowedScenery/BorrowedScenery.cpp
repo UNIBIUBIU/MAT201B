@@ -15,6 +15,7 @@ using namespace gam;
 using namespace std;
 float timestep = 1.0f;
 struct SharedState {
+  Pose pose;
   double time{0};
   // double angle{0};
 };
@@ -41,7 +42,7 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
   void onCreate() override {
     // load sound
-    samplePlayer.load("../asset/BS_7.wav");
+    samplePlayer.load("../asset/soundtrack.wav");
     // samplePlayer.loop();
     Sync::master().spu(audioIO().fps());
     // load elements
@@ -103,9 +104,8 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
       g.color(0);
       if (time < spiral_end) {
         // connector
-        circle(g, Vec3f(0, 0, -20), 10);
-        circle(g, Vec3f(0, 0, 40), 10);
-        line(g, Vec3f(0, 0, -20), Vec3f(0, 0, 40));
+        circle(g, Vec3f(0, 0, -20), 4);
+        circle(g, Vec3f(0, 0, 40), 4);
         // ruler
         ruler.draw(g);
         g.pushMatrix();
@@ -118,7 +118,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     }
     // section3
     if (animation.section3(time)) {
-
       // angle = 0.0;
       if (time < 85) {
         g.clear(0.65);
@@ -126,8 +125,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
         g.clear(0.0);
       }
       g.color(1);
-      rect(g, Vec3f(0, 0, 20), 0.31, 0.1);
-      cross(g, Vec3f(0, 0, -10), 0.31, 0.05);
       grid.draw_grid_2(g);
       pixelCloud.section3_draw(g);
     }
@@ -140,12 +137,8 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
       }
       grid.draw_grid_1(g);
       g.pushMatrix();
-      g.rotate(90, Vec3f(1, 0, 0));
-      pointCloud.draw(g);
-      g.popMatrix();
-      g.pushMatrix();
-      g.translate(0, 0, 19);
-      g.rotate(180, Vec3f(0, 1, 0));
+      g.translate(0, 0, 40);
+      g.rotate(100, Vec3f(0, 1, 0));
       pixelCloud.section1_draw(g);
       g.popMatrix();
     }
@@ -169,12 +162,16 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
   }
 
   virtual void simulate(double dt) override {
+    state().pose = nav();
     // if (app.isPrimary()) {
     // state().angle += 0.01;
     state().time += dt * timestep;
   }
 
   void onAnimate(double dt) override {
+    if (hasRole(ROLE_RENDERER) && !hasRole(ROLE_DESKTOP)) {
+      pose() = state().pose;
+    }
     if (pause) {
       return;
     }
@@ -183,11 +180,10 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     // double angle = state().angle;
 
     // initial nav
-    nav().pos(nav_current);
+    // ky nav().pos(nav_current);
 
     // opening
     if (animation.opening(time)) {
-
       ruler.update(dt);
       if (time > opening_pointcloud) {
         pointCloud.update(dt);
@@ -205,26 +201,25 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
       if (nav_current.x < 4) {
         nav_current.x += dt;
       }
-      nav().pos(nav_current);
+      // ky nav().pos(nav_current);
       ruler.reset();
     }
 
     if (animation.section2(time)) {
-
       pixelCloud.section2_update(dt);
       ruler.update(dt);
       if (time < spiral_start) {
-        nav_current = Vec3f(0, 0, 19);
-        nav().pos(nav_current);
+        // nav_current = Vec3f(0, 0, 19);
+        // ky nav().pos(nav_current);
         pixelCloud.reset(dt);
       } else if (time > spiral_end) {
-        if (nav_current.z > 5) {
-          nav_current.z -= dt;
-        }
-        nav().pos(nav_current);
+        // if (nav_current.z > 5) {
+        //   nav_current.z -= dt;
+        // }
+        // ky nav().pos(nav_current);
         pixelCloud.section1_update(dt);
       } else {
-        nav().pos(Vec3f(0, 0, 19));
+        // nav().pos(Vec3f(0, 0, 19));
       }
     }
 
@@ -244,10 +239,10 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     case 'j':
       pause = !pause;
       break;
-    case 'a':
+    case 'k':
       timestep = 10;
       break;
-    case 's':
+    case 'l':
       timestep = 1;
       break;
     }
@@ -264,8 +259,7 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
 int main(int argc, char *const argv[]) {
   DistributedExampleApp app;
-  // if (role() != ROLE_RENDERER)
-  //   app.initAudio();
+  app.displayMode(app.displayMode() | Window::STEREO_BUF);
   app.initAudio();
   app.start();
   return 0;
