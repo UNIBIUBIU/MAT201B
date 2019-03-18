@@ -1,6 +1,26 @@
 // This sketch is for loading image pixels and animating them
 
+// setup for dashedLine
+/*
+string slurp(string fileName) {
+  fstream file(fileName);
+  string returnValue = "";
+  while (file.good()) {
+    string line;
+    getline(file, line);
+    returnValue += line + "\n";
+  }
+  return returnValue;
+}
+*/
+
 struct PixelCloud {
+  /*
+  // add dashedLine shader
+  ShaderProgram pointShader;
+  ShaderProgram lineShader;
+  Mesh dashed;
+  */
   vector<Vec3f> pos[16]; //
   Mesh mesh1{Mesh::POINTS};
   Mesh mesh2{Mesh::POINTS};
@@ -168,10 +188,28 @@ struct PixelCloud {
             HSV(RGB(pixel.r / 255.0, pixel.g / 255.0, pixel.b / 255.0)).v;
         gray = mapFunction(gray, 0, 1, 0, 1.2);
         mesh5.color(Color(gray));
-        //mesh5.color(RGB(pixel.r / 255.0, pixel.g / 255.0, pixel.b / 255.0));
+        // mesh5.color(RGB(pixel.r / 255.0, pixel.g / 255.0, pixel.b / 255.0));
       }
     }
   }
+  /*
+  // setup dashedLine
+  void setupDashed() {
+    lineShader.compile(slurp("../line-vertex.glsl"),
+                       slurp("../line-fragment.glsl"),
+                       slurp("../line-geometry.glsl"));
+    dashed.primitive(Mesh::LINES);
+
+    for (int z = 0; z < 10; z++) {
+      for (int i = 0; i < 2000; i++) {
+        dashed.vertex((i - 1000) / 100.0,
+                      sin(sqrt(z) * 0.1 * (i - 1000)) /
+                          (0.1 * (i - 1000) / sqrt(z)),
+                      (z - 5));
+      }
+    }
+  }
+*/
 
   // image pixel animation
   void section1_update(double dt) {
@@ -243,21 +281,18 @@ struct PixelCloud {
     g.meshColor();
     g.pointSize(2);
     g.pushMatrix();
-    g.translate(0, 0, -25);
-    // g.rotate(40, Vec3f(1, 0, 1));
+    g.translate(0, 0, -40);
     g.draw(mesh1); // img1
     g.popMatrix();
 
     g.pushMatrix();
-    for (int i = 0; i < 2; i++) {
-      g.rotate(45 * i, Vec3f(0, 1, 0));
-      g.translate(0, 0, 25);
-      g.draw(mesh2); // img2
-    }
+    g.rotate(45, Vec3f(0, 1, 0));
+    g.translate(0, 0, 40);
+    g.draw(mesh2); // img2
     g.popMatrix();
 
     g.pushMatrix();
-    g.translate(0, 0, 35);
+    g.translate(0, 0, 40);
     g.draw(mesh3); // img2
     g.color(RGB((1.0f), (1.0f), (1.0f)));
 
@@ -266,26 +301,19 @@ struct PixelCloud {
     auto &m3 = mesh3.vertices();
     auto &m = mesh1.vertices();
 
-    // connecting image 1 with image 2
-    for (int i = 0; i < m2.size(); i += 50000) {
-      for (int j = 0; j < m.size(); j += 80000) {
-        if ((m2[i] - m[j]).mag() < 14.0f) {
-          dashedLine(g, m2[i], Vec3f(m[j].x, m[j].y, m[j].z - 60));
-          cross(g, Vec3f(m[j].x, m[j].y, m[j].z - 60), 0.4, 0.1);
-          cross(g, m2[i], 0.2, 0.06);
-        }
-      }
+    for (int i = 1; i < 15; i++) {
+      dashedLine(g, m2[50000 * i],
+                 Vec3f(m[50000 * i].x, m[50000 * i].y, m[50000 * i].z - 80));
+      cross(g, Vec3f(m[50000 * i].x, m[50000 * i].y, m[50000 * i].z - 80), 0.4,
+            0.1);
+      cross(g, m2[50000 * i], 0.2, 0.06);
+      dashedLine(g, m3[90000 * i],
+                 Vec3f(m[90000 * i].x, m[90000 * i].y, m[90000 * i].z - 80));
+      cross(g, Vec3f(m[90000 * i].x, m[90000 * i].y, m[90000 * i].z - 80), 0.4,
+            0.1);
+      cross(g, m3[90000 * i], 0.2, 0.06);
     }
-    // connecting image 3 with image 1
-    for (int i = 0; i < m3.size(); i += 90000) {
-      for (int j = 0; j < m.size(); j += 80000) {
-        if ((m3[i] - m[j]).mag() < 14.0f) {
-          dashedLine(g, m3[i], Vec3f(m[j].x, m[j].y, m[j].z - 60));
-          cross(g, Vec3f(m[j].x, m[j].y, m[j].z - 60), 0.4, 0.1);
-          cross(g, m3[i], 0.2, 0.06);
-        }
-      }
-    }
+
     g.popMatrix();
   }
 
@@ -293,27 +321,24 @@ struct PixelCloud {
     g.meshColor();
     g.pushMatrix();
     g.pointSize(2.5);
-    g.translate(0, 0, -20);
+    g.translate(0, 0, -40);
     g.draw(mesh4); // img4
     g.popMatrix();
   }
 
   void section3_draw(Graphics &g) {
     g.pushMatrix();
-    g.rotate(angle, Vec3f(1, 0, 1));
+    g.rotate(angle, Vec3f(-1, 0, -1));
 
     g.meshColor();
     g.pointSize(2);
     g.pushMatrix();
-    g.translate(0, 0, -20);
+    g.translate(0, 0, -40);
     g.draw(mesh5); // img5
-    g.popMatrix();
-    g.pushMatrix();
-    g.translate(0, 0, 40);
-    g.draw(mesh5);
     g.popMatrix();
 
     // draw cross
+    /*
     auto &m5 = mesh5.vertices();
     for (int i = 0; i < m5.size(); i += 30000) {
       g.color(1);
@@ -324,6 +349,7 @@ struct PixelCloud {
       cross(g, Vec3f(m5[i].x, m5[i].y, m5[i].z - 20), 0.35, 0.05);
       cross(g, Vec3f(m5[i].x, m5[i].y, m5[i].z + 40), 0.35, 0.05);
     }
+    */
     g.popMatrix();
   }
 

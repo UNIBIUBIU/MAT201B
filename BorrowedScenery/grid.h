@@ -11,16 +11,13 @@ struct Ruler {
 
   void draw(Graphics &g) {
     g.color(1);
-    dashedLine(g, Vec3f(0, 0, 200), Vec3f(0, 0, -200));
-    dashedLine(g, Vec3f(200, 0, 0), Vec3f(-200, 0, 0));
-    dashedLine(g, Vec3f(0, -50, 0), Vec3f(0, 100, 0));
     cross(g, Vec3f(0, 0, 0), 0.05, 0.3);
     for (int x = -200; x < 201; x += dis) {
-      Vec3f pos(x + offset, 0, 0);
+      Vec3f pos(x + offset, 0, -20);
       rect(g, pos, 0.1, 0.02);
       rect(g, pos, 0.01 + dis / 200, 0.3 + dis / 20);
       for (int i = 1; i < 11; i++) {
-        Vec3f pos2(x + i * dis / 10 + offset, 0, 0);
+        Vec3f pos2(x + i * dis / 10 + offset, 0, -20);
         rect(g, pos2, 0.01 + dis / 200, 0.05 + dis / 40);
       }
     }
@@ -158,20 +155,6 @@ struct Grid {
     g.popMatrix();
     lineTexture.unbind();
 
-    for (int i = -100; i < 101; i += 40) {
-      dashedLine(g, Vec3f(20, i, 0), Vec3f(-50, i, 0));
-      g.pushMatrix();
-      g.rotate(90, Vec3f(0, 1, 0));
-      dashedLine(g, Vec3f(60, i, 0), Vec3f(-20, i, 0));
-      g.popMatrix();
-      g.pushMatrix();
-      g.rotate(90, Vec3f(0, 0, 1));
-      dashedLine(g, Vec3f(60, i, 0), Vec3f(-20, i, 0));
-      g.popMatrix();
-    }
   }
 
-  void draw_grid_3(Graphics &g){
-    
-  }
 };

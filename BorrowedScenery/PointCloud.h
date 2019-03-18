@@ -66,7 +66,7 @@ struct PointCloud {
     // draw mesh
     g.pushMatrix();
     g.meshColor();
-    g.translate(0, 0, -10);
+    g.translate(0, 0, -60);
     g.rotate(angle, Vec3f(0, 1, 0));
     g.color(RGB((0.9f), (0.9f), (0.9f)));
     g.draw(pointClouds_Mesh);
