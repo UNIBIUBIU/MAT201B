@@ -1,15 +1,15 @@
-#include "Gamma/SamplePlayer.h" //sound
+#include "Gamma/SamplePlayer.h"  //sound
 #include "al/core.hpp"
 #include "al/core/app/al_DistributedApp.hpp"
 #include "al/util/al_Asset.hpp"
 #include "al/util/al_Image.hpp"
 
-#include "shader.h"
-#include <algorithm> // max
-#include <cstdint>   // uint8_t
+#include <algorithm>  // max
+#include <cstdint>    // uint8_t
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include "shader.h"
 using namespace al;
 using namespace gam;
 using namespace std;
@@ -35,6 +35,12 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     if (hasRole(ROLE_RENDERER)) {
       displayMode(displayMode() | Window::STEREO_BUF);
     }
+    if (hasRole(ROLE_DESKTOP)) {
+      initAudio();
+    } else {
+      initAudio(44100, 1024, 60, 60, 10);
+    }
+    Domain::master().spu(audioIO().framesPerSecond());
   }
 
   bool pause = false;
@@ -50,7 +56,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     // load sound
     samplePlayer.load("../asset/soundtrack.wav");
     // samplePlayer.loop();
-    Sync::master().spu(audioIO().fps());
     // load elements
     pointCloud.setup();
     grid.setup();
@@ -69,7 +74,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     // opening
     g.clear(0);
     if (animation.opening(time)) {
-
       ruler.draw(g);
       if (time > opening_pointcloud && time < opening_pointcloud + 6) {
         pixelCloud.box_draw(g);
@@ -85,7 +89,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
     // section 1
     if (animation.section1(time)) {
-
       pixelCloud.section1_draw(g);
       if (time > grid_start) {
         grid.draw_grid_1(g);
@@ -94,7 +97,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
     // section 2
     if (animation.section2(time)) {
-
       if (time > spiral_end) {
         pixelCloud.section1_draw(g);
         grid.draw_grid_1(g);
@@ -113,7 +115,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     }
     // section3
     if (animation.section3(time)) {
-
       g.color(1);
       grid.draw_grid_2(g);
       if (time < section3_riverend) {
@@ -124,7 +125,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     }
     // section4
     if (animation.section4(time)) {
-
       grid.draw_grid_1(g);
       g.pushMatrix();
       g.translate(0, 0, 10);
@@ -134,7 +134,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     }
     // ending
     if (animation.ending(time)) {
-
       grid.draw_grid_1(g);
       pointCloud.draw(g);
     }
@@ -216,15 +215,15 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
   // interaction
   void onKeyDown(const Keyboard &k) override {
     switch (k.key()) {
-    case 'j':
-      pause = !pause;
-      break;
-    case 'k':
-      timestep = 10;
-      break;
-    case 'l':
-      timestep = 1;
-      break;
+      case 'j':
+        pause = !pause;
+        break;
+      case 'k':
+        timestep = 10;
+        break;
+      case 'l':
+        timestep = 1;
+        break;
     }
   }
 
@@ -239,13 +238,7 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
   }
 };
 
-int main(int argc, char *const argv[]) {
+int main() {
   DistributedExampleApp app;
-
-  // for the sphere...
-  app.audioIO().device(AudioDevice("ECHO XS"));
-
-  app.initAudio();
   app.start();
-  return 0;
 };
