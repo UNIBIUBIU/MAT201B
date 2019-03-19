@@ -1,15 +1,15 @@
-#include "Gamma/SamplePlayer.h"  //sound
+#include "Gamma/SamplePlayer.h" //sound
 #include "al/core.hpp"
 #include "al/core/app/al_DistributedApp.hpp"
 #include "al/util/al_Asset.hpp"
 #include "al/util/al_Image.hpp"
 
-#include <algorithm>  // max
-#include <cstdint>    // uint8_t
+#include "shader.h"
+#include <algorithm> // max
+#include <cstdint>   // uint8_t
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include "shader.h"
 using namespace al;
 using namespace gam;
 using namespace std;
@@ -67,8 +67,9 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
   void onDraw(Graphics &g) override {
     double time = state().time;
     // opening
+    g.clear(0);
     if (animation.opening(time)) {
-      g.clear(0);
+
       ruler.draw(g);
       if (time > opening_pointcloud && time < opening_pointcloud + 6) {
         pixelCloud.box_draw(g);
@@ -84,7 +85,7 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
     // section 1
     if (animation.section1(time)) {
-      g.clear(0);
+
       pixelCloud.section1_draw(g);
       if (time > grid_start) {
         grid.draw_grid_1(g);
@@ -93,7 +94,7 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
     // section 2
     if (animation.section2(time)) {
-      g.clear(0);
+
       if (time > spiral_end) {
         pixelCloud.section1_draw(g);
         grid.draw_grid_1(g);
@@ -112,7 +113,7 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     }
     // section3
     if (animation.section3(time)) {
-      g.clear(0);
+
       g.color(1);
       grid.draw_grid_2(g);
       if (time < section3_riverend) {
@@ -123,7 +124,7 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     }
     // section4
     if (animation.section4(time)) {
-      g.clear(0);
+
       grid.draw_grid_1(g);
       g.pushMatrix();
       g.translate(0, 0, 10);
@@ -133,12 +134,11 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     }
     // ending
     if (animation.ending(time)) {
-      g.clear(0);
+
       grid.draw_grid_1(g);
       pointCloud.draw(g);
     }
     if (time > ending_end) {
-      g.clear(0);
     }
 
     // Movers
@@ -216,15 +216,15 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
   // interaction
   void onKeyDown(const Keyboard &k) override {
     switch (k.key()) {
-      case 'j':
-        pause = !pause;
-        break;
-      case 'k':
-        timestep = 10;
-        break;
-      case 'l':
-        timestep = 1;
-        break;
+    case 'j':
+      pause = !pause;
+      break;
+    case 'k':
+      timestep = 10;
+      break;
+    case 'l':
+      timestep = 1;
+      break;
     }
   }
 
