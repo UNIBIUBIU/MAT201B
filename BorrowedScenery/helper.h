@@ -23,6 +23,45 @@ void circle(Graphics &g, Vec3f center, float radius) {
   // g.color(HSV(rnd::uniform(1.0f), rnd::uniform(1.0f), rnd::uniform(1.0f)).v);
   g.draw(m);
 }
+void box(Graphics &g, Vec3f pos, float l, float h) {
+  Mesh m{Mesh::LINES};
+  m.vertex(pos.x - l / 2, pos.y + l / 2, pos.z - h / 2);
+  m.vertex(pos.x + l / 2, pos.y + l / 2, pos.z - h / 2);
+
+  m.vertex(pos.x + l / 2, pos.y + l / 2, pos.z - h / 2);
+  m.vertex(pos.x + l / 2, pos.y - l / 2, pos.z - h / 2);
+
+  m.vertex(pos.x + l / 2, pos.y - l / 2, pos.z - h / 2);
+  m.vertex(pos.x - l / 2, pos.y - l / 2, pos.z - h / 2);
+
+  m.vertex(pos.x - l / 2, pos.y - l / 2, pos.z - h / 2);
+  m.vertex(pos.x - l / 2, pos.y + l / 2, pos.z - h / 2);
+
+  m.vertex(pos.x + l / 2, pos.y + l / 2, pos.z - h / 2);
+  m.vertex(pos.x + l / 2, pos.y + l / 2, pos.z + h / 2);
+
+  m.vertex(pos.x + l / 2, pos.y - l / 2, pos.z - h / 2);
+  m.vertex(pos.x + l / 2, pos.y - l / 2, pos.z + h / 2);
+
+  m.vertex(pos.x - l / 2, pos.y - l / 2, pos.z - h / 2);
+  m.vertex(pos.x - l / 2, pos.y - l / 2, pos.z + h / 2);
+
+  m.vertex(pos.x - l / 2, pos.y + l / 2, pos.z - h / 2);
+  m.vertex(pos.x - l / 2, pos.y + l / 2, pos.z + h / 2);
+
+  m.vertex(pos.x - l / 2, pos.y + l / 2, pos.z + h / 2);
+  m.vertex(pos.x + l / 2, pos.y + l / 2, pos.z + h / 2);
+
+  m.vertex(pos.x + l / 2, pos.y + l / 2, pos.z + h / 2);
+  m.vertex(pos.x + l / 2, pos.y - l / 2, pos.z + h / 2);
+
+  m.vertex(pos.x + l / 2, pos.y - l / 2, pos.z + h / 2);
+  m.vertex(pos.x - l / 2, pos.y - l / 2, pos.z + h / 2);
+
+  m.vertex(pos.x - l / 2, pos.y - l / 2, pos.z + h / 2);
+  m.vertex(pos.x - l / 2, pos.y + l / 2, pos.z + h / 2);
+  g.draw(m);
+}
 
 void rect(Graphics &g, Vec3f pos, float width, float height) {
   Mesh m{Mesh::TRIANGLES};
@@ -73,7 +112,6 @@ void dashedLine(Graphics &g, Vec3f a, Vec3f b) {
   }
   g.draw(verts);
 }
-
 
 void cross(Graphics &g, Vec3f pos, float width, float height) {
   Mesh m{Mesh::TRIANGLES};

@@ -1,6 +1,6 @@
 // This sketch is for building particle system [Mover]
 
-#define N (300)           // number of particles
+#define N (200)           // number of particles
 #define CLOUD_WIDTH (5.0) // width particles
 struct Mover {
   float G;

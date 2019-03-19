@@ -48,8 +48,8 @@ struct PointCloud {
         Vec3f p(data1[row][0] * scale, data1[row][1] * scale,
                 data1[row][2] * scale);
         // triangle 1
-        float w = rnd::uniform(0.001 * scale, 0.005 * scale);
-        float h = rnd::uniform(0.001 * scale, 0.005 * scale);
+        float w = rnd::uniform(0.01 * scale, 0.01 * scale);
+        float h = rnd::uniform(0.01 * scale, 0.01 * scale);
         pointClouds_Mesh.vertex(p.x, p.y, p.z);
         pointClouds_Mesh.vertex(p.x, p.y + h * sin(row), p.z);
         pointClouds_Mesh.vertex(p.x + w * cos(row) * cos(row),
@@ -66,14 +66,14 @@ struct PointCloud {
     // draw mesh
     g.pushMatrix();
     g.meshColor();
-    g.translate(0, 0, -60);
+    g.translate(0, 0, -40+r);
     g.rotate(angle, Vec3f(0, 1, 0));
     g.color(RGB((0.9f), (0.9f), (0.9f)));
     g.draw(pointClouds_Mesh);
     g.popMatrix();
     // draw 2nd mesh [moving]
     g.pushMatrix();
-    g.translate(0, 0, -20 + r);
+    g.translate(0, 0, -20 + r*2);
     g.draw(pointClouds_Mesh);
     g.popMatrix();
   }

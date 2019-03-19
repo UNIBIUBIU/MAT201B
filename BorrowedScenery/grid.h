@@ -1,5 +1,4 @@
-// The sketch is to draw grid and Ruler
-
+// The sketch is to draw grid and Ruler and box
 struct Ruler {
   float offset = 0.0f;
   float acel = 0.01f;
@@ -11,7 +10,7 @@ struct Ruler {
 
   void draw(Graphics &g) {
     g.color(1);
-    cross(g, Vec3f(0, 0, 0), 0.05, 0.3);
+    cross(g, Vec3f(0, 0, -20), 0.05, 0.3);
     for (int x = -200; x < 201; x += dis) {
       Vec3f pos(x + offset, 0, -20);
       rect(g, pos, 0.1, 0.02);
@@ -100,20 +99,19 @@ struct Grid {
   void draw_grid_1(Graphics &g) {
     // draw rectangle
 
-    for (int x = -20; x < 31; x += 3) {
-      for (int y = -30; y < 21; y += 3) {
-        Vec3f pos(x, y + rnd::uniform(-10, 10), x * sin(x));
-        Vec3f pos2(x * cos(x), y, y);
+    for (int x = -30; x < 31; x += 4) {
+      for (int y = -30; y < 31; y += 4) {
+        Vec3f pos(x, y * sin(x), x * sin(x));
+        Vec3f pos2(x * cos(x) * cos(x), y * sin(x), x);
         cross(g, pos, rnd::uniform(0.01, 0.1), 0.02);
         rect(g, pos2, 0.02, rnd::uniform(0.1, 0.2));
         g.color(RGB(1, 1, 1));
       }
     }
 
-
     // draw grid
     lineTexture.bind();
-    g.shader(lineShader);
+    // g.shader(lineShader);
     grid.color(RGB(0.5, 0.5, 0.5));
     g.pushMatrix();
     g.draw(grid);
@@ -134,18 +132,19 @@ struct Grid {
   void draw_grid_2(Graphics &g) {
     // draw rectangle
 
-    for (int x = -20; x < 31; x += 3) {
-      for (int y = -30; y < 21; y += 3) {
-        Vec3f pos(x, y + rnd::uniform(-10, 10), x * sin(x));
-        Vec3f pos2(x, y, y);
-        rect(g, pos, rnd::uniform(0.01, 0.2), 0.02);
+    for (int x = -30; x < 31; x += 4) {
+      for (int y = -30; y < 31; y += 4) {
+        Vec3f pos(x, y * sin(x), x * sin(x));
+        Vec3f pos2(x * cos(x) * cos(x), y * sin(x), x);
+        cross(g, pos, rnd::uniform(0.01, 0.1), 0.02);
         rect(g, pos2, 0.02, rnd::uniform(0.1, 0.2));
+        g.color(RGB(1, 1, 1));
       }
     }
 
     // draw grid
     lineTexture.bind();
-    g.shader(lineShader);
+    // g.shader(lineShader);
     g.pushMatrix();
     g.draw(grid);
     g.popMatrix();
@@ -158,7 +157,5 @@ struct Grid {
     g.draw(grid);
     g.popMatrix();
     lineTexture.unbind();
-
   }
-
 };

@@ -31,6 +31,8 @@ struct PixelCloud {
   float time = 0;
   float time2 = 0;
   float time3 = 0;
+  float time_box = 0;
+
   float angle = 0;
   // load images
   PixelCloud() {
@@ -144,8 +146,8 @@ struct PixelCloud {
       for (int column = 0; column < image_4.width(); column += 2) {
         image_4.read(pixel, column, row);
         Vec3f o4;
-        o4.x = mapFunction(column, 0, image_4.width(), -1, 1);
-        o4.y = mapFunction(row, 0, image_4.height(), -1, 1);
+        o4.x = mapFunction(column, 0, image_4.width(), -2, 2);
+        o4.y = mapFunction(row, 0, image_4.height(), -3, 3);
         o4.z = 0;
         pos[7].push_back(o4);
 
@@ -166,12 +168,12 @@ struct PixelCloud {
     }
 
     // image5 pixel arrangement
-    for (int row = 0; row < image_5.height(); row += 3) {
+    for (int row = 0; row < image_5.height(); row += 4) {
       for (int column = 0; column < image_5.width(); column++) {
         image_5.read(pixel, column, row);
         Vec3f o5;
-        o5.x = mapFunction(column, 0, image_5.width(), -2, 2);
-        o5.y = mapFunction(row, 0, image_5.height(), -1, 1);
+        o5.x = mapFunction(column, 0, image_5.width(), -2.5, 2.5);
+        o5.y = mapFunction(row, 0, image_5.height(), -1.5, 1.5);
         o5.z = 0;
         pos[9].push_back(o5);
 
@@ -179,10 +181,23 @@ struct PixelCloud {
         Vec3f h5;
         HSV color(RGB(pixel.r, pixel.g, pixel.b));
         h5.x = color.s * sin(M_2PI * color.h);
-        h5.y = color.s * cos(M_2PI * color.h);
+        h5.y = color.s * cos(M_2PI * color.s);
         h5.z = color.v / 255;
         pos[10].push_back(h5);
+
+        // for box
+        Vec3f b5;
+        b5.x = mapFunction(column, 0, image_5.width(), -2, 2);
+        b5.y = mapFunction(row, 0, image_5.height(), -2, 2);
+        b5.z = mapFunction(pixel.g, 0.0, 255.0, -15.0, 15.0);
+        pos[11].push_back(b5);
         mesh5.vertex(o5);
+
+        Vec3f ob5;
+        ob5.x = mapFunction(column, 0, image_5.width(), -2, 2);
+        ob5.y = mapFunction(row, 0, image_5.height(), -2, 2);
+        ob5.z = 0;
+        pos[12].push_back(o5);
 
         float gray =
             HSV(RGB(pixel.r / 255.0, pixel.g / 255.0, pixel.b / 255.0)).v;
@@ -261,7 +276,7 @@ struct PixelCloud {
   }
 
   void section3_update(double &dt) {
-    angle += dt;
+    angle += dt / 4;
     // image 5
     auto &m5 = mesh5.vertices();
     time3 += dt / timestep;
@@ -276,23 +291,33 @@ struct PixelCloud {
     }
   }
 
+  void box_update(double &dt) {
+    // image 5
+    auto &m5 = mesh5.vertices();
+    time_box += dt / timestep;
+    for (int i = 0; i < m5.size(); i++) {
+      timestep = 1;
+      m5[i] = pos[12][i] * (6 - time_box) + pos[11][i] * time_box;
+    }
+  }
+
   void section1_draw(Graphics &g) {
     // draw images
     g.meshColor();
     g.pointSize(2);
     g.pushMatrix();
-    g.translate(0, 0, -40);
+    g.translate(0, 0, -30);
     g.draw(mesh1); // img1
     g.popMatrix();
 
     g.pushMatrix();
     g.rotate(45, Vec3f(0, 1, 0));
-    g.translate(0, 0, 40);
+    g.translate(0, 0, 30);
     g.draw(mesh2); // img2
     g.popMatrix();
 
     g.pushMatrix();
-    g.translate(0, 0, 40);
+    g.translate(0, 0, 30);
     g.draw(mesh3); // img2
     g.color(RGB((1.0f), (1.0f), (1.0f)));
 
@@ -302,16 +327,16 @@ struct PixelCloud {
     auto &m = mesh1.vertices();
 
     for (int i = 1; i < 15; i++) {
-      dashedLine(g, m2[50000 * i],
-                 Vec3f(m[50000 * i].x, m[50000 * i].y, m[50000 * i].z - 80));
-      cross(g, Vec3f(m[50000 * i].x, m[50000 * i].y, m[50000 * i].z - 80), 0.4,
+      dashedLine(g, m2[10000 * i],
+                 Vec3f(m[10000 * i].x, m[10000 * i].y, m[10000 * i].z - 80));
+      cross(g, Vec3f(m[10000 * i].x, m[10000 * i].y, m[10000 * i].z - 80), 0.4,
             0.1);
-      cross(g, m2[50000 * i], 0.2, 0.06);
-      dashedLine(g, m3[90000 * i],
-                 Vec3f(m[90000 * i].x, m[90000 * i].y, m[90000 * i].z - 80));
-      cross(g, Vec3f(m[90000 * i].x, m[90000 * i].y, m[90000 * i].z - 80), 0.4,
+      cross(g, m2[10000 * i], 0.2, 0.06);
+      dashedLine(g, m3[10000 * i],
+                 Vec3f(m[10000 * i].x, m[10000 * i].y, m[10000 * i].z - 80));
+      cross(g, Vec3f(m[10000 * i].x, m[10000 * i].y, m[10000 * i].z - 80), 0.4,
             0.1);
-      cross(g, m3[90000 * i], 0.2, 0.06);
+      cross(g, m3[10000 * i], 0.2, 0.06);
     }
 
     g.popMatrix();
@@ -332,27 +357,30 @@ struct PixelCloud {
 
     g.meshColor();
     g.pointSize(2);
-    g.pushMatrix();
-    g.translate(0, 0, -40);
+    g.translate(0, 0, -30);
     g.draw(mesh5); // img5
-    g.popMatrix();
-
     // draw cross
-    /*
+
     auto &m5 = mesh5.vertices();
-    for (int i = 0; i < m5.size(); i += 30000) {
-      g.color(1);
-      dashedLine(g, Vec3f(m5[i].x, m5[i].y, m5[i].z + 40),
-                 Vec3f(m5[i].x, m5[i].y, m5[i].z - 20));
+    for (int i = 1; i < 10; i++) {
+      g.rotate(45, Vec3f(1, 0, 0));
       g.color(RGB(1, 0, 0));
-      g.rotate(45, Vec3f(0, 1, 0));
-      cross(g, Vec3f(m5[i].x, m5[i].y, m5[i].z - 20), 0.35, 0.05);
-      cross(g, Vec3f(m5[i].x, m5[i].y, m5[i].z + 40), 0.35, 0.05);
+      cross(g, Vec3f(m5[20000 * i].x, m5[20000 * i].y, m5[20000 * i].z), 0.4,
+            0.1);
     }
-    */
+
     g.popMatrix();
   }
 
+  void box_draw(Graphics &g) {
+    g.color(1);
+    g.draw(mesh5);
+    box(g, Vec3f(0, 0, 0), 4, 30);
+  }
+
   // reset
-  void reset(double &dt) { time = 0; }
+  void reset(double &dt) {
+    time = 0;
+    time_box = 0;
+  }
 };

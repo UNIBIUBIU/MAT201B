@@ -15,33 +15,28 @@ float movers_end = 250;
 // section1
 float section1_start = 21;
 float section1_end = 40;
-float blink1 = section1_start + 0.5;
-float blink2 = section1_end - 0.5;
 float grid_start = section1_start + 5;
 
 // section2
 float section2_start = 40;
 float section2_end = 60;
-float spiral_start = section2_start + 8;
+float spiral_start = section2_start + 6;
 float spiral_end = section2_start + 10;
 
 // section3
 float section3_start = 60;
 float section3_end = 130;
-
+float section3_riverend = 110;
 // section4
 float section4_start = 130;
 float section4_end = 150;
 
 // ending
 float ending_start = 150;
-float ending_end = 180;
+float ending_end = 165;
 
 // model scale animation
 float scalestep = 6;
-
-// nav animation
-Vec3f nav_current(0, 0, 19);
 
 // set up keynotes for the Animation
 struct AnimationProcess {
@@ -86,6 +81,6 @@ struct Animation {
     section2.schedule(section2_start, section2_end);
     section3.schedule(section3_start, section3_end);
     section4.schedule(section4_start, section4_end);
-    ending.schedule(ending_start,ending_end);
+    ending.schedule(ending_start, ending_end);
   }
 };

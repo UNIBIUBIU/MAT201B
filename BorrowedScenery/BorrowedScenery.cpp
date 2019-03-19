@@ -60,14 +60,13 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
   void onDraw(Graphics &g) override {
     double time = state().time;
-    // double angle = state().angle;
-
-    // g.rotate(angle, Vec3f(0, 1, 0));
     // opening
     if (animation.opening(time)) {
       g.clear(0);
       ruler.draw(g);
-      if (time > opening_pointcloud) {
+      if (time > opening_pointcloud && time < opening_pointcloud + 6) {
+        pixelCloud.box_draw(g);
+      } else if (time > opening_pointcloud + 6) {
         pointCloud.draw(g);
       }
     }
@@ -79,13 +78,7 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
     // section 1
     if (animation.section1(time)) {
-      if (time < blink1) {
-        g.clear(rnd::uniform(0.0, 1.0));
-      } else if (time > blink2) {
-        g.clear(rnd::uniform(0.0, 1.0));
-      } else {
-        g.clear(0);
-      }
+      g.clear(0);
       pixelCloud.section1_draw(g);
       if (time > grid_start) {
         grid.draw_grid_1(g);
@@ -95,17 +88,14 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     // section 2
     if (animation.section2(time)) {
       if (time < spiral_start) {
-        g.clear(0.8);
+        g.clear(0);
       } else if (time > spiral_end) {
-        g.clear(rnd::uniform(0.0, 1.0));
+        g.clear(0);
         pixelCloud.section1_draw(g);
         grid.draw_grid_1(g);
       }
       g.color(0);
       if (time < spiral_end) {
-        // connector
-        circle(g, Vec3f(0, 0, -20), 4);
-        circle(g, Vec3f(0, 0, 40), 4);
         // ruler
         ruler.draw(g);
         g.pushMatrix();
@@ -118,27 +108,22 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     }
     // section3
     if (animation.section3(time)) {
-      // angle = 0.0;
-      if (time < 85) {
-        g.clear(0.65);
-      } else {
-        g.clear(0.0);
-      }
+      g.clear(0);
       g.color(1);
       grid.draw_grid_2(g);
-      pixelCloud.section3_draw(g);
+      if (time < section3_riverend) {
+        pixelCloud.section3_draw(g);
+      } else {
+        pixelCloud.box_draw(g);
+      }
     }
     // section4
     if (animation.section4(time)) {
-      if (time < 140) {
-        g.clear(0);
-      } else {
-        g.clear(1);
-      }
+      g.clear(0);
       grid.draw_grid_1(g);
       g.pushMatrix();
-      g.translate(0, 0, 40);
-      g.rotate(100, Vec3f(0, 1, 0));
+      g.translate(0, 0, 10);
+      g.rotate(140, Vec3f(0, 1, 0));
       pixelCloud.section1_draw(g);
       g.popMatrix();
     }
@@ -146,17 +131,15 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
     if (animation.ending(time)) {
       g.clear(0);
       grid.draw_grid_1(g);
+      pointCloud.draw(g);
+    }
+    if (time > ending_end) {
+      g.clear(0);
     }
 
     // Movers
     if (animation.movers(time)) {
-      if (time > spiral_start && time < section2_end) {
-        g.color(0);
-      } else if (time > section3_start && time < section3_end) {
-        g.color(0.1);
-      } else {
-        g.color(RGB(0.8, 0.8, 0.8));
-      }
+      g.color(1);
       movers.draw(g);
     }
   }
@@ -178,14 +161,14 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
     double time = state().time;
     // double angle = state().angle;
-
-    // initial nav
-    // ky nav().pos(nav_current);
-
     // opening
+
     if (animation.opening(time)) {
+      // pixelCloud.box_update(dt);
       ruler.update(dt);
-      if (time > opening_pointcloud) {
+      if (time > opening_pointcloud && time < opening_pointcloud + 6) {
+        pixelCloud.box_update(dt);
+      } else if (time > opening_pointcloud + 6) {
         pointCloud.update(dt);
       }
     }
@@ -197,11 +180,6 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
     if (animation.transition(time) || animation.section1(time)) {
       pixelCloud.section1_update(dt);
-      // animate nav
-      if (nav_current.x < 4) {
-        nav_current.x += dt;
-      }
-      // ky nav().pos(nav_current);
       ruler.reset();
     }
 
@@ -209,27 +187,25 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
       pixelCloud.section2_update(dt);
       ruler.update(dt);
       if (time < spiral_start) {
-        // nav_current = Vec3f(0, 0, 19);
-        // ky nav().pos(nav_current);
         pixelCloud.reset(dt);
       } else if (time > spiral_end) {
-        // if (nav_current.z > 5) {
-        //   nav_current.z -= dt;
-        // }
-        // ky nav().pos(nav_current);
         pixelCloud.section1_update(dt);
-      } else {
-        // nav().pos(Vec3f(0, 0, 19));
       }
     }
 
     if (animation.section3(time)) {
-      // angle = 0.0;
-      pixelCloud.section3_update(dt);
-      pixelCloud.reset(dt);
+      if (time < section3_riverend) {
+        pixelCloud.section3_update(dt);
+        pixelCloud.reset(dt);
+      } else {
+        pixelCloud.box_update(dt);
+      }
     }
     if (animation.section4(time)) {
       pixelCloud.section1_update(dt);
+    }
+    if (animation.ending(time)) {
+      pointCloud.update(dt);
     }
   }
 
