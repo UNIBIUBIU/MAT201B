@@ -1,15 +1,15 @@
-#include "Gamma/SamplePlayer.h" //sound
+#include "Gamma/SamplePlayer.h"  //sound
 #include "al/core.hpp"
 #include "al/core/app/al_DistributedApp.hpp"
 #include "al/util/al_Asset.hpp"
 #include "al/util/al_Image.hpp"
 
-#include "shader.h"
-#include <algorithm> // max
-#include <cstdint>   // uint8_t
+#include <algorithm>  // max
+#include <cstdint>    // uint8_t
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include "shader.h"
 using namespace al;
 using namespace gam;
 using namespace std;
@@ -31,6 +31,12 @@ struct SharedState {
 // struct AlloApp : App {
 
 struct DistributedExampleApp : DistributedApp<SharedState> {
+  DistributedExampleApp() {
+    if (hasRole(ROLE_RENDERER)) {
+      displayMode(displayMode() | Window::STEREO_BUF);
+    }
+  }
+
   bool pause = false;
   PixelCloud pixelCloud;
   Movers movers;
@@ -212,30 +218,35 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
   // interaction
   void onKeyDown(const Keyboard &k) override {
     switch (k.key()) {
-    case 'j':
-      pause = !pause;
-      break;
-    case 'k':
-      timestep = 10;
-      break;
-    case 'l':
-      timestep = 1;
-      break;
+      case 'j':
+        pause = !pause;
+        break;
+      case 'k':
+        timestep = 10;
+        break;
+      case 'l':
+        timestep = 1;
+        break;
     }
   }
 
   void onSound(AudioIOData &io) override {
+    int n = io.channelsOut();
     while (io()) {
-      float f = samplePlayer();
-      io.out(0) = f;
-      io.out(1) = f;
+      float f = samplePlayer() / n;
+      for (int i = 0; i < n; ++i) {
+        io.out(i) = f;
+      }
     }
   }
 };
 
 int main(int argc, char *const argv[]) {
   DistributedExampleApp app;
-  app.displayMode(app.displayMode() | Window::STEREO_BUF);
+
+  // for the sphere...
+  app.audioIO().device(AudioDevice("ECHO XS"));
+
   app.initAudio();
   app.start();
   return 0;
