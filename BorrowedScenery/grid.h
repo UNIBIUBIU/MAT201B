@@ -99,15 +99,17 @@ struct Grid {
 
   void draw_grid_1(Graphics &g) {
     // draw rectangle
-    for (int x = -50; x < 101; x += 3) {
-      for (int y = -100; y < 101; y += 3) {
+
+    for (int x = -20; x < 31; x += 3) {
+      for (int y = -30; y < 21; y += 3) {
         Vec3f pos(x, y + rnd::uniform(-10, 10), x * sin(x));
-        Vec3f pos2(x * cos(x) * cos(y), y * sin(y), y);
+        Vec3f pos2(x * cos(x), y, y);
         cross(g, pos, rnd::uniform(0.01, 0.1), 0.02);
         rect(g, pos2, 0.02, rnd::uniform(0.1, 0.2));
         g.color(RGB(1, 1, 1));
       }
     }
+
 
     // draw grid
     lineTexture.bind();
@@ -131,14 +133,16 @@ struct Grid {
 
   void draw_grid_2(Graphics &g) {
     // draw rectangle
-    for (int x = -50; x < 101; x += 3) {
-      for (int y = -100; y < 101; y += 3) {
+
+    for (int x = -20; x < 31; x += 3) {
+      for (int y = -30; y < 21; y += 3) {
         Vec3f pos(x, y + rnd::uniform(-10, 10), x * sin(x));
-        Vec3f pos2(x, y * sin(y), y);
+        Vec3f pos2(x, y, y);
         rect(g, pos, rnd::uniform(0.01, 0.2), 0.02);
         rect(g, pos2, 0.02, rnd::uniform(0.1, 0.2));
       }
     }
+
     // draw grid
     lineTexture.bind();
     g.shader(lineShader);
