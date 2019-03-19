@@ -93,10 +93,8 @@ struct DistributedExampleApp : DistributedApp<SharedState> {
 
     // section 2
     if (animation.section2(time)) {
-      if (time < spiral_start) {
-        g.clear(0);
-      } else if (time > spiral_end) {
-        g.clear(0);
+      g.clear(0);
+      if (time > spiral_end) {
         pixelCloud.section1_draw(g);
         grid.draw_grid_1(g);
       }
